@@ -1,0 +1,22 @@
+{
+  "name": "when-should-i-post",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "start": "next start"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "jquery": "^3.2.1",
+    "metrics-graphics": "^2.11.0",
+    "next": "^2.1.1",
+    "react": "^15.5.4",
+    "react-addons-shallow-compare": "^15.5.2",
+    "react-dom": "^15.5.4",
+    "react-vis": "^1.4.0"
+  }
+}
