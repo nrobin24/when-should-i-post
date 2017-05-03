@@ -1,2 +1,6 @@
 .next
 node_modules
+scripts/DynamoDBtoCSV/config.json
+notebooks/praw.ini
+notebooks/.ipynb_checkpoints
+data
