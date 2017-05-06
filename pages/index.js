@@ -17,9 +17,25 @@ export default class Counter extends React.Component {
 
   render () {
     return (
-      <Provider store={this.store}>
-        <Page title='When Should I Post' linkTo='/other' />
-      </Provider>
+      <div>
+        <Provider store={this.store}>
+          <Page />
+
+        </Provider>
+        <style jsx global>{`
+          @import url('https://fonts.googleapis.com/css?family=Inconsolata|Rubik');
+          body {
+            margin: 0 0 0 0;
+          }
+          h1 {
+            font-family: 'Rubik', sans-serif;
+            color: #A9B2B9;
+            font-size: 1.6em
+          }
+          `}
+        </style>
+      </div>
+
     )
   }
 }

@@ -2,7 +2,8 @@ import Dropdown from 'react-dropdown'
 
 const options = [
   'r/food',
-  'r/whatsfordinner'
+  'r/whatsfordinner',
+  'r/blablablablablablabl'
 ]
 
 let defaultOption = options[0]
@@ -22,6 +23,9 @@ export default () => (
       .Dropdown-control {
         position: relative;
         overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         background-color: white;
         border: 1px solid #ccc;
         border-radius: 2px;
@@ -29,9 +33,11 @@ export default () => (
         color: #333;
         cursor: default;
         outline: none;
-        padding: 8px 52px 8px 10px;
+        padding: 8px 10px 8px 6px;
         transition: all 200ms ease;
+        width: 280px;
       }
+
 
       .Dropdown-control:hover {
         box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
@@ -44,10 +50,6 @@ export default () => (
         content: ' ';
         display: block;
         height: 0;
-        margin-top: -ceil(2.5);
-        position: absolute;
-        right: 10px;
-        top: 14px;
         width: 0
       }
 
@@ -107,6 +109,12 @@ export default () => (
         cursor: default;
         display: block;
         padding: 8px 10px;
+      }
+
+      .Dropdown-placeholder {
+          font-size: 1.6em;
+          font-family: 'Rubik', sans-serif;
+          color: #98E8E7;
       }
     `}
     </style>
