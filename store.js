@@ -2,6 +2,7 @@ import { action, observable } from 'mobx'
 
 let store = null
 
+
 class Store {
   @observable lastUpdate = 0
   @observable light = false
