@@ -5,3 +5,6 @@ notebooks/praw.ini
 notebooks/.ipynb_checkpoints
 data
 functions/scraper/credentials.json
+functions/scraper/*.js
+functions/updater/*.js
+functions/updater/credentials.json

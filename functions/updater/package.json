@@ -1,5 +1,5 @@
 {
-  "name": "scraper",
+  "name": "updater",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,9 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "moment": "^2.18.1",
-    "promisify-node": "^0.4.0",
-    "ramda": "^0.23.0",
-    "snoowrap": "^1.14.0"
+    "aws-sdk": "^2.50.0"
+  },
+  "devDependencies": {
+    "@types/aws-sdk": "^2.7.0"
   }
 }
