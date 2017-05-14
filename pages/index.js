@@ -3,6 +3,8 @@ import { Provider } from 'mobx-react'
 import { initStore } from '../store'
 import Page from '../components/Page'
 
+import uiState from '../UiState'
+
 export default class Counter extends React.Component {
   static getInitialProps ({ req }) {
     const isServer = !!req
@@ -18,7 +20,7 @@ export default class Counter extends React.Component {
   render () {
     return (
       <div>
-        <Provider store={this.store}>
+        <Provider uiState={uiState} >
           <Page />
 
         </Provider>

@@ -4,3 +4,4 @@ scripts/DynamoDBtoCSV/config.json
 notebooks/praw.ini
 notebooks/.ipynb_checkpoints
 data
+functions/scraper/credentials.json

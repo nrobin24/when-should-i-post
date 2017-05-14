@@ -8,12 +8,12 @@ const options = [
 
 let defaultOption = options[0]
 
-function onSelect(x) {
-  console.log(x)
-  defaultOption = x
+function onSelect(uiState, newVal) {
+  console.log(newVal)
+  uiState.selectedSubreddit = newVal
 }
 
-export default () => (
+export default ({uiState}) => (
   <div>
     <style jsx global>{`
       .Dropdown-root {
@@ -120,8 +120,8 @@ export default () => (
     </style>
     <Dropdown
       options={options}
-      onChange={onSelect}
-      value={defaultOption}
+      onChange={(newVal) => onSelect(uiState, newVal)}
+      value={uiState.selectedSubreddit}
       placeholder="Select an option"
     />
   </div>

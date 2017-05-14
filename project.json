@@ -1,0 +1,8 @@
+{
+  "name": "when-should-i-post",
+  "description": "",
+  "memory": 128,
+  "timeout": 5,
+  "role": "arn:aws:iam::021963864089:role/when-should-i-post_lambda_function",
+  "environment": {}
+}
