@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "dynasty": "^0.2.7",
     "moment": "^2.18.1",
     "promisify-node": "^0.4.0",
     "ramda": "^0.23.0",
