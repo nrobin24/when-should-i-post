@@ -1,55 +1,33 @@
 import * as AWS from 'aws-sdk'
 import * as moment from 'moment'
 import * as R from 'ramda'
+import {indexTable} from './shared/aws-utils'
+import * as fetch from 'node-fetch'
 
-const fetch = require('node-fetch')
-
-const snoowrap = require('snoowrap')
-
-const credentials = require('credentials')
-const dynasty = require('dynasty')(credentials.dynamo);
-
-const indexTableName = 'nr-wsip-posts_index'
-const dataTableName = 'nr-wsip-posts_data'
+const updateEligibilityRules = {
+  minMinutesSinceCreated: (60 * 4),
+  maxMinutesSinceCreated: (60 * 24),
+  minMinutesSinceLastUpdated: (60 * 4)
+}
 
 export async function handle(e, ctx, cb) {
   try {
+    const primaryKey = moment().format('YYYY-MM-DD')
+
+    const postIds = await getTodayPostIds(primaryKey)
+    const eligiblePostIds = postIds.filter(isEligiblePostId)
+    console.log(`found ${eligiblePostIds.length} eligibile out of ${postIds.length} total posts for today in index table`)
 
 
-    const postIds = await getPostIds()
+    const posts = await getPostsFromReddit(eligiblePostIds.map(p => p.post_id))
 
-    console.log('post ids sample')
+    const eligiblePosts = posts.filter(p => p.id && p.score)
+    console.log(`retreived ${eligiblePosts.length} eligible out of ${posts.length} total posts from reddit`)
 
-    console.log(R.take(10, postIds))
-
-    const batches = R.splitEvery(20, postIds)
-
-    console.log(`found ${postIds.length} posts`)
-
-    // Get data from reddit
-    // const {clientId, clientSecret, refreshToken} = credentials
-    // const r = new snoowrap({
-    //   userAgent: credentials.userAgent,
-    //   clientId,
-    //   clientSecret,
-    //   refreshToken
-    // })
-
-    // const postsNested = await Promise.all(batches.map(b => r.getSubmission(R.pluck('post_id', b))))
-    // const posts = R.unnest(postsNested)
-
-    const baseUrl = `https://www.reddit.com`
-    let url = baseUrl + `/by_id/` + batches[0].map(i => 't3_' + i).join(',') + '.json'
-    console.log('url', url)
-    const posts = await fetch(url).then(r => r.json()).then(r => r.data.children)
-
-    console.log(`got ${posts.length} posts`)
-
-    console.log(`updating data table`)
-    const postsUpdateResp = await Promise.all(posts.filter(p => p.id && p.score).map(p => updateScore(p.id, p.score)))
-
-    // console.log(`got data for ${posts.length} posts`)
-    // console.log(posts)
+    const updateIndexResp = await Promise.all(eligiblePosts.map(p => updateScore(primaryKey, p.id, p.score)))
+    const nonEmptyIndexResps = updateIndexResp.filter(r => !!Object.keys(r).length)
+    console.log(`got update index table response, non empty responses:`)
+    console.log(nonEmptyIndexResps)
 
     cb(null, 'done')
   } catch (e) {
@@ -58,14 +36,33 @@ export async function handle(e, ctx, cb) {
   }
 }
 
-const indexTable = dynasty.table(indexTableName)
-const dataTable = dynasty.table(dataTableName)
-
-function getPostIds(): Promise<string[]> {
-  const today = moment().format('YYYY-MM-DD')
-  return indexTable.findAll(today).then(ps => ps.map(p => p.post_id))
+function isEligiblePostId(indexRow: IndexRow): boolean {
+  const created = moment.unix(indexRow.created)
+  const updated = moment.unix(indexRow.last_updated)
+  const now = moment()
+  const isAfterMinSinceCreated = now.isAfter(created.add(updateEligibilityRules.minMinutesSinceCreated, 'minutes'))
+  const isBeforeMaxSinceCreated = now.isBefore(created.add(updateEligibilityRules.maxMinutesSinceCreated, 'minutes'))
+  const isAfterMinSinceUpdated = now.isAfter(updated.add(updateEligibilityRules.minMinutesSinceLastUpdated))
+  return isAfterMinSinceCreated && isBeforeMaxSinceCreated && isAfterMinSinceUpdated
 }
 
-function updateScore(post_id: string, score: number): Promise<any> {
-  return dataTable.update(post_id, {score})
+function getTodayPostIds(primaryKey: string): Promise<IndexRow[]> {
+  return indexTable.findAll(primaryKey)
+}
+
+function getPostsFromReddit(postIds: string[]): Promise<Post[]> {
+  const postBatchSize = 20 // number of posts to retreive from reddit API in a single request
+  const postIdBatches = R.splitEvery(postBatchSize, postIds)
+
+  const baseUrl = `https://www.reddit.com`
+  const urls = postIdBatches
+    .map(batch => `${baseUrl}/by_id/${batch.map(i => `t3_${i}`).join(',')}.json`)
+
+  const requests = urls.map(url => fetch(url).then(r => r.json().then(r => r.data.children)))
+  return Promise.all(requests).then(R.pipe(R.unnest, R.pluck('data')))
+}
+
+function updateScore(primaryKey: string, post_id: string, score: number): Promise<any> {
+  const now = moment().unix()
+  return indexTable.update({ hash: primaryKey, range: post_id }, { score, last_updated: now })
 }
