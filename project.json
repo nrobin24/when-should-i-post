@@ -1,8 +1,14 @@
 {
   "name": "when-should-i-post",
+  "runtime": "nodejs6.10",
+  "handler": "index.handle",
   "description": "",
   "memory": 128,
-  "timeout": 5,
+  "timeout": 180,
   "role": "arn:aws:iam::021963864089:role/when-should-i-post_lambda_function",
-  "environment": {}
+  "environment": {},
+  "hooks" : {
+    "build" : "npm install && tsc",
+    "clean" : "rm -f *.js"
+  }
 }

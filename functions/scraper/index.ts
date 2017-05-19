@@ -1,7 +1,6 @@
 import * as moment from 'moment'
-import {indexTable, dataTable} from './shared/aws-utils'
-import {r} from './shared/reddit-utils'
-const credentials: Credentials = require('./shared/credentials')
+import {updateIndexItem, dataTable} from './shared/aws-utils'
+import {getPopularSubreddits, getNewPosts} from './shared/reddit-utils'
 
 const numTopSubs = 20 // how many of the top subreddits to scrape
 const numPostsPerSub = 50 // number of posts per subreddit to srape
@@ -20,27 +19,24 @@ export async function handle(e, ctx, cb) {
 
 async function getPosts(): Promise<Post[]> {
   // Get posts data
-  const subs: String[] = await r.getPopularSubreddits({ limit: numTopSubs })
-    .map(s => s.display_name)
+  const subs: string[] =  await getPopularSubreddits(numTopSubs)
 
-  const newPostsNested = await Promise.all(subs.map(s => r.getSubreddit(s)
-    .getNew({ limit: numPostsPerSub })))
+  const newPostsNested = await Promise.all(subs.map(s => getNewPosts(numPostsPerSub, s)))
 
   const newPostsData = newPostsNested.reduce((p, c) => p.concat(c), [])
   return newPostsData.map(p => {
-    const {id, created, subreddit, ups, title, author, selftext, permalink} = p
+    const {id, created_utc: created, subreddit, ups, title, author, selftext, permalink} = p
     const lastUpdate = moment().unix()
     return { id, created, subreddit: subreddit.display_name, title, author, selftext, permalink }
   })
 }
 
-async function updateIndexTable(posts: Post[]) {
+function updateIndexTable(posts: Post[]) {
+
   const toIndexUpdate = (post: Post) => {
-    const today = moment().format('YYYY-MM-DD')
+    const today = moment.utc().format('YYYY-MM-DD')
     const now = moment().unix()
-    const key = { hash: today, range: post.id }
-    const val = { created: post.created, last_updated: now }
-    return indexTable.update(key, val)
+    return updateIndexItem(today, post.id, post.created, now)
   }
 
   // Upsert post ids in index table
