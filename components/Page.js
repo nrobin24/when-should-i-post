@@ -5,17 +5,16 @@ import Clock from './Clock'
 import SubredditSelector from './subredditSelector'
 import SubredditPlot from './SubredditPlot'
 
-@inject('store') @observer
+@inject('uiState') @observer
 class Page extends React.Component {
   componentDidMount () {
-    this.props.store.start()
   }
 
   componentWillUnmount () {
-    this.props.store.stop()
   }
 
   render () {
+    const stateName = this.props.uiState
     return (
       <div style={pageContainer}>
         <div style={contentContainer}>
@@ -25,13 +24,14 @@ class Page extends React.Component {
               <h1>{'When should I post in'}</h1>
             </div>
             <div style={selectorContainer}>
-              <SubredditSelector />
+              <SubredditSelector uiState={stateName}/>
             </div>
             <div>
               <h1>?</h1>
             </div>
           </div>
           <div style={contentRow}>
+            <p>{this.props.uiState.selectedSubreddit}</p>
             <div style={chartContainer}>
               <SubredditPlot></SubredditPlot>
             </div>
