@@ -3,8 +3,8 @@ import * as R from 'ramda'
 import {updateIndexTable, updateDataTable} from './shared/aws-utils'
 import {getPopularSubreddits, getNewPosts} from './shared/reddit-utils'
 
-const numTopSubs = 20 // how many of the top subreddits to scrape
-const numPostsPerSub = 50 // number of posts per subreddit to srape
+const numTopSubs = 50 // how many of the top subreddits to scrape
+const numPostsPerSub = 20 // number of posts per subreddit to srape
 
 export async function handle(e, ctx, cb) {
   try {

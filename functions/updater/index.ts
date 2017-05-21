@@ -1,9 +1,7 @@
-import * as AWS from 'aws-sdk'
 import * as moment from 'moment'
 import * as R from 'ramda'
 import {getIndexItems, updateIndexTable} from './shared/aws-utils'
 import {getPostsById} from './shared/reddit-utils'
-import * as fetch from 'node-fetch'
 
 const updateEligibilityRules = {
   minMinutesSinceCreated: (60 * 4),
@@ -37,8 +35,8 @@ function isEligibleIndexItem(item: IndexItem): boolean {
   const created = moment.unix(item.created_utc)
   const updated = moment.unix(item.last_updated)
   const now = moment()
-  const isAfterMinSinceCreated = now.isAfter(created.add(updateEligibilityRules.minMinutesSinceCreated, 'minutes'))
-  const isBeforeMaxSinceCreated = now.isBefore(created.add(updateEligibilityRules.maxMinutesSinceCreated, 'minutes'))
-  const isAfterMinSinceUpdated = now.isAfter(updated.add(updateEligibilityRules.minMinutesSinceLastUpdated))
+  const isAfterMinSinceCreated = now.isAfter(created.clone().add(updateEligibilityRules.minMinutesSinceCreated, 'minutes'))
+  const isBeforeMaxSinceCreated = now.isBefore(created.clone().add(updateEligibilityRules.maxMinutesSinceCreated, 'minutes'))
+  const isAfterMinSinceUpdated = now.isAfter(updated.clone().add(updateEligibilityRules.minMinutesSinceLastUpdated, 'minutes'))
   return isAfterMinSinceCreated && isBeforeMaxSinceCreated && isAfterMinSinceUpdated
 }

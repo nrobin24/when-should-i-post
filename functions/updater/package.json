@@ -9,16 +9,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/ramda": "0.0.9",
-    "aws-sdk": "^2.50.0",
-    "dynasty": "^0.2.7",
     "moment": "^2.18.1",
-    "node-fetch": "^1.6.3",
-    "ramda": "^0.23.0",
-    "snoowrap": "^1.14.0"
+    "ramda": "^0.23.0"
   },
   "devDependencies": {
-    "@types/aws-sdk": "^2.7.0",
-    "@types/moment": "^2.13.0"
+    "@types/ramda": "0.0.9"
   }
 }
