@@ -1,5 +1,0 @@
-{
-  "runtime": "nodejs6.10",
-  "handler": "index.handle",
-  "timeout": 120 
-}
