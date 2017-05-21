@@ -21,7 +21,7 @@ async function updateTable(posts: Post[], tableName, updater: TableUpdater) {
   const updateResp = await Promise.all(posts.map(updater))
   const nonEmptyResps = updateResp.filter(r => !!Object.keys(r).length)
   if (nonEmptyResps) {
-    console.log(`got non emptry responses:`)
+    console.log(`got non-empty responses:`)
     console.log(nonEmptyResps)
   } else {
     console.log(`success`)
