@@ -1,11 +1,11 @@
 import React from 'react'
 import Link from 'next/link'
 import { inject, observer } from 'mobx-react'
-import Clock from './Clock'
-import SubredditSelector from './subredditSelector'
+import SubredditSelector from './SubredditSelector'
 import SubredditPlot from './SubredditPlot'
+import WordProbs from './WordProbs'
 
-@inject('uiState') @observer
+@inject('uiState', 'dataState') @observer
 class Page extends React.Component {
   componentDidMount () {
   }
@@ -14,7 +14,6 @@ class Page extends React.Component {
   }
 
   render () {
-    const stateName = this.props.uiState
     return (
       <div style={pageContainer}>
         <div style={contentContainer}>
@@ -24,7 +23,7 @@ class Page extends React.Component {
               <h1>{'When should I post in'}</h1>
             </div>
             <div style={selectorContainer}>
-              <SubredditSelector uiState={stateName}/>
+              <SubredditSelector uiState={this.props.uiState} dataState={this.props.dataState}/>
             </div>
             <div>
               <h1>?</h1>
@@ -37,6 +36,7 @@ class Page extends React.Component {
             </div>
           </div>
           <div style={contentRow}>
+            <WordProbs uiState={this.props.uiState}/>
           </div>
 
         </div>

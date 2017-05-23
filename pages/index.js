@@ -1,26 +1,30 @@
 import React from 'react'
 import { Provider } from 'mobx-react'
-import { initStore } from '../store'
+// import { initStore } from '../store'
 import Page from '../components/Page'
 
-import uiState from '../UiState'
+import UiState from '../state/UiState'
+import DataState from '../state/DataState'
 
-export default class Counter extends React.Component {
-  static getInitialProps ({ req }) {
-    const isServer = !!req
-    const store = initStore(isServer)
-    return { lastUpdate: store.lastUpdate, isServer }
-  }
+const uiState = new UiState()
+const dataState = new DataState(uiState)
+
+export default class Index extends React.Component {
+  // static getInitialProps ({ req }) {
+  //   const isServer = !!req
+  //   const store = initStore(isServer)
+  //   return { lastUpdate: store.lastUpdate, isServer }
+  // }
 
   constructor (props) {
     super(props)
-    this.store = initStore(props.isServer, props.lastUpdate)
+    // this.store = initStore(props.isServer, props.lastUpdate)
   }
 
   render () {
     return (
       <div>
-        <Provider uiState={uiState} >
+        <Provider uiState={uiState} dataState={dataState}>
           <Page />
 
         </Provider>
