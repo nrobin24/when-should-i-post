@@ -32,7 +32,7 @@ class Page extends React.Component {
           <div style={contentRow}>
             <p>{this.props.uiState.selectedSubreddit}</p>
             <div style={chartContainer}>
-              <SubredditPlot></SubredditPlot>
+              {this.props.uiState.currentSubreddit.time_of_day && <SubredditPlot uiState={this.props.uiState}></SubredditPlot>}
             </div>
           </div>
           <div style={contentRow}>
@@ -73,7 +73,7 @@ const chartContainer = {
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',
-  alignItems: 'center'
+  alignItems: 'center',
 }
 
 // STYLES

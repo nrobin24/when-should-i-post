@@ -3,14 +3,19 @@ const chroma = require('chroma-js')
 import R from 'ramda'
 
 // const scale = chroma.scale('RdYlBu').mode('lab')
-
-const scale = chroma.scale(['hotpink', '#98E8E7'])
+// const scale = chroma.cubehelix().scale()
+// const scale = chroma.scale(['hotpink', '#98E8E7'])
     // .mode('lch')
     // .correctLightness();
 // const scale = chroma.scale(['lightyellow', 'navy']).domain([0.01, 0.5], 7, 'log');
+const scale = chroma.cubehelix()
+    .start(400)
+    .rotations(-0.8)
+    .gamma(0.8)
+    .lightness([0.3, 0.8])
+    .scale()
 
-
-const tag = ([word, prob]) => <div style={tagStyle(prob * 50)} key={word}>{word}</div>
+const tag = ([word, prob]) => <div style={tagStyle(prob * 20)} key={word}>{word}</div>
 
 const WordProbs = observer((props) => {
 
@@ -59,5 +64,6 @@ const tagStyle = (prob) => ({
   borderRadius: 8,
   padding: 8,
   margin: 5,
-  backgroundColor: scale(prob).hex()
+  color: chroma(scale(prob + 0.5).hex()).darken(2),
+  backgroundColor: scale(prob + 0.5).hex()
 })
