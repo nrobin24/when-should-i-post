@@ -33,10 +33,15 @@ export default class Index extends React.Component {
           body {
             margin: 0 0 0 0;
           }
-          h1 {
+          h1, h2 {
             font-family: 'Rubik', sans-serif;
             color: #A9B2B9;
+          }
+          h1 {
             font-size: 1.6em
+          }
+          h2 {
+            font-size: 1.2em
           }
           `}
         </style>
