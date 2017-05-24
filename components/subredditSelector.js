@@ -111,7 +111,7 @@ const SubredditSelector = observer((props) => (
       onChange={(newVal) => {
         props.dataState.setCurrentSubreddit(newVal.value)
       }}
-      value={props.uiState.currentSubreddit.name}
+      value={props.uiState.currentSubredditName}
       placeholder="Select an option"
     />
   </div>

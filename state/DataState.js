@@ -2,7 +2,7 @@ import {action, observable, computed} from 'mobx'
 require('es6-promise').polyfill();
 require('isomorphic-fetch');
 
-const dataUrl = 'https://s3-us-west-2.amazonaws.com/nr-wsip/public/data.json'
+const dataUrl = 'https://s3-us-west-2.amazonaws.com/nr-wsip/public/sub_data.json'
 
 class DataState {
   @observable data = {}
@@ -17,8 +17,14 @@ class DataState {
   loadData = async () => {
     try {
       this.data = await fetch(dataUrl).then(r => r.json())
-      this.uiState.subredditNames = this.data.subreddits.map(d => d.name)
-      this.uiState.setSubreddit(this.data.subreddits[0])
+      if (!this.data) {
+        return
+      }
+      console.log('got data')
+      console.log(this.data)
+      this.uiState.subredditNames = Object.keys(this.data)
+      const name = Object.keys(this.data)[0]
+      this.uiState.setSubreddit(name, this.data[name])
     } catch (e) {
       console.error('loadData failed', e.message)
     }
@@ -26,12 +32,10 @@ class DataState {
 
   @action
   setCurrentSubreddit(name) {
-    const names = this.data.subreddits.map(d => d.name)
-    const i = names.indexOf(name)
-    if (i < 0) {
+    if (!this.data[name]) {
       throw new Error(`could not find subreddit: ${name}`)
     }
-    this.uiState.setSubreddit(this.data.subreddits[i])
+    this.uiState.setSubreddit(name, this.data[name])
   }
 //   @computed get bathTempData() {
 //     return this.bathTempHistory.slice()

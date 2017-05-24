@@ -3,14 +3,16 @@ import {action, observable, computed} from 'mobx'
 
 class UiState {
   @observable loading = false
-  @observable currentSubreddit = {name: "...", probs: {}}
+  @observable currentSubreddit = {}
+  @observable currentSubredditName
   @observable subredditNames = []
 
   constructor() {
   }
 
-  @action setSubreddit(newSubreddit) {
+  @action setSubreddit(name, newSubreddit) {
     this.currentSubreddit = newSubreddit
+    this.currentSubredditName = name
   }
 
   // @computed get subreddits() {
