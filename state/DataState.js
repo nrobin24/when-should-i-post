@@ -1,5 +1,4 @@
 import {action, observable, computed} from 'mobx'
-require('es6-promise').polyfill();
 require('isomorphic-fetch');
 
 const dataUrl = 'https://s3-us-west-2.amazonaws.com/nr-wsip/public/sub_data.json'

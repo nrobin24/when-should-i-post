@@ -1,4 +1,3 @@
-
 import {action, observable, computed} from 'mobx'
 
 class UiState {
