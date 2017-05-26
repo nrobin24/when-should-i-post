@@ -1,19 +1,7 @@
 import Dropdown from 'react-dropdown'
+import {observer} from 'mobx-react'
 
-const options = [
-  'r/food',
-  'r/whatsfordinner',
-  'r/blablablablablablabl'
-]
-
-let defaultOption = options[0]
-
-function onSelect(uiState, newVal) {
-  console.log(newVal)
-  uiState.selectedSubreddit = newVal
-}
-
-export default ({uiState}) => (
+const SubredditSelector = observer((props) => (
   <div>
     <style jsx global>{`
       .Dropdown-root {
@@ -119,10 +107,14 @@ export default ({uiState}) => (
     `}
     </style>
     <Dropdown
-      options={options}
-      onChange={(newVal) => onSelect(uiState, newVal)}
-      value={uiState.selectedSubreddit}
+      options={props.uiState.subredditNames}
+      onChange={(newVal) => {
+        props.dataState.setCurrentSubreddit(newVal.value)
+      }}
+      value={props.uiState.currentSubredditName}
       placeholder="Select an option"
     />
   </div>
-)
+))
+
+export default SubredditSelector

@@ -1,83 +1,120 @@
 import { VictoryBar, VictoryChart, VictoryAxis, VictoryLine, VictoryTheme } from 'victory'
+import { inject, observer } from 'mobx-react'
 import * as R from 'ramda'
+import moment from 'moment'
+const chroma = require('chroma-js')
 
-const myData = {
-  max: 3,
-  points: [
-    {day: 1, posts: 4},
-    {day: 2, posts: 7},
-    {day: 3, posts: 9},
-    {day: 4, posts: 2},
-    {day: 5, posts: 2},
-    {day: 6, posts: 5},
-    {day: 7, posts: 3},
-  ]
+const aqua = chroma('aquamarine').luminance(0.6)
+const purple = chroma('darkslateblue').luminance(0.3)
+
+function toPlotData(data) {
+  const {bin, count, med} = data
+  return R.range(0, bin.length)
+    .map(i => ({minute: bin[i] * 30, count: count[i], med: med[i]}))
 }
 
-const isMaxTick = R.equals(myData.max)
+export default observer(({uiState}) => {
+  let data = []
+  if (uiState.currentSubreddit.time_of_day) {
+    data = toPlotData(uiState.currentSubreddit.time_of_day)
+  }
 
-export default () => (
-  <VictoryChart
-    height={400}
-    width={600}
-    domainPadding={20}
-    theme={VictoryTheme.material}
-  >
-    <VictoryAxis
-      domain={[1,7]}
-      tickValues={[1, 2, 3, 4, 5, 6, 7]}
-      tickFormat={['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']}
-      style={{
-        axis: {
-          stroke: "#CED7D6"
-        },
-        ticks: {
-          stroke: "#CED7D6"
-        },
-        tickLabels: {
-          fontSize: 20,
-          // fill: "#98E8E7",
-          fill: (t) => isMaxTick(t) ? "#98E8E7" : "#CED7D6",
-          fontWeight: (t) => isMaxTick(t) ? "bold" : "regular"
-        },
-        grid: {
-          // stroke: (t) => isMaxTick(t) ? "#A9B2B9" : "#CED7D6",
-        }
-      }}
-    />
+  return (
+    <svg width={600} height={300}>
+      <g transform={"translate(75, 0)"}>
+        <VictoryAxis
 
-    <VictoryAxis
-      dependentAxis
-      label={"Upvote Score"}
-      domain={[0,10]}
-      tickFormat={(x) => x}
-      style={{
-        axisLabel: {
-          fontSize: 18,
-          padding: 30,
-          fill: "#A9B2B9"
-        },
-        axis: {
-          stroke: "#CED7D6"
-        },
-        ticks: {
-          stroke: "#CED7D6"
-        },
-        tickLabels: {
-          fontSize: 14,
-          fill: "#CED7D6"
-        },
-        // grid: {
-        //   stroke: "#CED7D6"
-        // }
-      }}
-    />
-    <VictoryLine
-      data={myData.points} x="day" y="posts"
-      interpolation="monotoneX"
-      style={{
-        data: {stroke: "#A9B2B9"}
-      }}
-    />
-  </VictoryChart>
-)
+          fixLabelOverlap={true}
+          standalone={false}
+          tickFormat={(x) => moment.utc(0).add(x, 'minutes').format('hh:mm')}
+          domain={[0,1440]}
+          style={{
+            axis: {
+              stroke: "#CED7D6"
+            },
+            ticks: {
+              stroke: "#CED7D6"
+            },
+            tickLabels: {
+              fontFamily: 'Inconsolata',
+              fontSize: 16,
+              fill: "#A9B2B9"
+            },
+            grid: {
+              // stroke: (t) => isMaxTick(t) ? "#A9B2B9" : "#CED7D6",
+            }
+          }}
+        />
+
+        <VictoryAxis
+          dependentAxis
+          standalone={false}
+          label={"# of Posts"}
+          tickFormat={(x) => x}
+          style={{
+            axisLabel: {
+              padding: 40,
+              fontFamily: 'Inconsolata',
+              fontSize: 18,
+              fill: aqua
+            },
+            axis: {
+              stroke: "#CED7D6"
+            },
+            ticks: {
+              stroke: aqua
+            },
+            tickLabels: {
+              fontFamily: 'Inconsolata',
+              fontSize: 14,
+              fill: aqua
+            }
+          }}
+        />
+        <VictoryLine
+          animate={{ duration: 500, easing: "bounce" }}
+          standalone={false}
+          data={data} x="minute" y="count"
+          interpolation="monotoneX"
+          style={{
+            data: {stroke: aqua}
+          }}
+        />
+        <VictoryAxis
+          standalone={false}
+          dependentAxis
+          label={"Median Score"}
+          orientation="right"
+          tickFormat={(x) => x}
+          style={{
+            axisLabel: {
+              padding: 40,
+              fontFamily: 'Inconsolata',
+              fontSize: 18,
+              fill: purple
+            },
+            axis: {
+              stroke: "#CED7D6"
+            },
+            ticks: {
+              stroke: purple
+            },
+            tickLabels: {
+              fontFamily: 'Inconsolata',
+              fontSize: 14,
+              fill: purple
+            }
+          }}
+        />
+        <VictoryLine
+          animate={{ duration: 500, easing: "bounce" }}
+          standalone={false}
+          data={data} x="minute" y="med"
+          interpolation="monotoneX"
+          style={{
+            data: {stroke: purple}
+          }}
+        />
+      </g>
+    </svg>
+)})
