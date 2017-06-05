@@ -5,15 +5,15 @@ import {getPostsById} from './shared/reddit-utils'
 
 const updateEligibilityRules = {
   minMinutesSinceCreated: (60 * 4),
-  maxMinutesSinceCreated: (60 * 25),
+  maxMinutesSinceCreated: (60 * 26),
   minMinutesSinceLastUpdated: (60 * 4)
 }
 
 export async function handle(e, ctx, cb) {
   try {
-    const yesterday = moment().subtract(1, 'days').format('YYYY-MM-DD')
+    const yesterday = moment.utc().subtract(1, 'days').format('YYYY-MM-DD')
     const yesterdayItems = await getIndexItems(yesterday)
-    const today = moment().format('YYYY-MM-DD')
+    const today = moment.utc().format('YYYY-MM-DD')
     const todayItems = await getIndexItems(today)
     const indexItems = R.concat(todayItems, yesterdayItems)
 
@@ -34,7 +34,7 @@ export async function handle(e, ctx, cb) {
 function isEligibleIndexItem(item: IndexItem): boolean {
   const created = moment.unix(item.created_utc)
   const updated = moment.unix(item.last_updated)
-  const now = moment()
+  const now = moment.utc()
   const isAfterMinSinceCreated = now.isAfter(created.clone().add(updateEligibilityRules.minMinutesSinceCreated, 'minutes'))
   const isBeforeMaxSinceCreated = now.isBefore(created.clone().add(updateEligibilityRules.maxMinutesSinceCreated, 'minutes'))
   const isAfterMinSinceUpdated = now.isAfter(updated.clone().add(updateEligibilityRules.minMinutesSinceLastUpdated, 'minutes'))

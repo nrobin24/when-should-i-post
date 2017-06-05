@@ -33,7 +33,7 @@ function updateIndexItem(post: Post) {
   const item = postToIndexItem(post)
   const Key = { day: toDynamoValue(item.day), id: toDynamoValue(item.id) }
   const AttributeUpdates = R.mergeAll([
-    toDynamoPut('last_updated', moment().unix()),
+    toDynamoPut('last_updated', moment.utc().unix()),
     toDynamoPut('created_utc', item.created_utc),
     toDynamoPut('score', item.score)
   ])
