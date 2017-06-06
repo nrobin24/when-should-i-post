@@ -16,3 +16,5 @@ shared/*.js
 npm-debug.log
 
 out
+
+.DS_Store
