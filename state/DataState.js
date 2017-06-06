@@ -1,4 +1,5 @@
 import {action, observable, computed} from 'mobx'
+import R from 'ramda'
 require('isomorphic-fetch');
 
 const dataUrl = 'https://s3-us-west-2.amazonaws.com/nr-wsip/public/sub_data.json'
@@ -21,9 +22,11 @@ class DataState {
       }
       console.log('got data')
       console.log(this.data)
-      this.uiState.subredditNames = Object.keys(this.data)
-      const name = Object.keys(this.data)[0]
-      this.uiState.setSubreddit(name, this.data[name])
+      const subredditNames = this.data.map(d => d.subreddit_name)
+      this.uiState.subredditNames = subredditNames
+      // this.uiState.subredditNames = Object.keys(this.data)
+      const name = subredditNames[0]
+      this.uiState.setSubreddit(name, this.data[0].data)
     } catch (e) {
       console.error('loadData failed', e.message)
     }
@@ -31,10 +34,11 @@ class DataState {
 
   @action
   setCurrentSubreddit(name) {
-    if (!this.data[name]) {
+    const entry = R.find(R.propEq('subreddit_name', name), this.data)
+    if (!entry) {
       throw new Error(`could not find subreddit: ${name}`)
     }
-    this.uiState.setSubreddit(name, this.data[name])
+    this.uiState.setSubreddit(name, entry.data)
   }
 //   @computed get bathTempData() {
 //     return this.bathTempHistory.slice()
