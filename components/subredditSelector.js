@@ -1,120 +1,145 @@
 import Dropdown from 'react-dropdown'
 import {observer} from 'mobx-react'
+import Autosuggest from 'react-autosuggest'
+import React from 'react'
+import R from 'ramda'
 
-const SubredditSelector = observer((props) => (
+
+// Teach Autosuggest how to calculate suggestions for any given input value.
+const getSuggestions = (value , subreddits) => {
+  const inputValue = value.trim().toLowerCase();
+  const inputLength = value.length;
+
+  return inputLength === 0 ? subreddits.slice() : subreddits.filter(sub => {
+    return sub.toLowerCase().slice(0, inputLength) === inputValue
+  })
+}
+
+const getSuggestionValue = suggestion => suggestion
+
+const renderSuggestion = suggestion => (
   <div>
-    <style jsx global>{`
-      .Dropdown-root {
-        position: relative;
-      }
-
-      .Dropdown-control {
-        position: relative;
-        overflow: hidden;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        background-color: white;
-        border: 1px solid #ccc;
-        border-radius: 2px;
-        box-sizing: border-box;
-        color: #333;
-        cursor: default;
-        outline: none;
-        padding: 8px 10px 8px 6px;
-        transition: all 200ms ease;
-        width: 280px;
-      }
-
-
-      .Dropdown-control:hover {
-        box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
-      }
-
-      .Dropdown-arrow {
-        border-color: #999 transparent transparent;
-        border-style: solid;
-        border-width: 5px 5px 0;
-        content: ' ';
-        display: block;
-        height: 0;
-        width: 0
-      }
-
-      .is-open .Dropdown-arrow {
-        border-color: transparent transparent #999;
-        border-width: 0 5px 5px;
-      }
-
-      .Dropdown-menu {
-        background-color: white;
-        border: 1px solid #ccc;
-        box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
-        box-sizing: border-box;
-        margin-top: -1px;
-        max-height: 200px;
-        overflow-y: auto;
-        position: absolute;
-        top: 100%;
-        width: 100%;
-        z-index: 1000;
-        -webkit-overflow-scrolling: touch;
-      }
-
-      .Dropdown-menu .Dropdown-group > .Dropdown-title {
-        padding: 8px 10px;
-        color: rgba(51, 51, 51, 1.2);
-        font-weight: bold;
-        text-transform: capitalize;
-      }
-
-      .Dropdown-option {
-        box-sizing: border-box;
-        color: rgba(51, 51, 51, 0.8);
-        cursor: pointer;
-        display: block;
-        padding: 8px 10px;
-      }
-
-      .Dropdown-option:last-child {
-        border-bottom-right-radius: 2px;
-        border-bottom-left-radius: 2px;
-      }
-
-      .Dropdown-option:hover {
-        background-color: #f2f9fc;
-        color: #333;
-      }
-
-      .Dropdown-option.is-selected {
-        background-color: #f2f9fc;
-        color: #333;
-      }
-
-      .Dropdown-noresults {
-        box-sizing: border-box;
-        color: #ccc;
-        cursor: default;
-        display: block;
-        padding: 8px 10px;
-      }
-
-      .Dropdown-placeholder {
-          font-size: 1.6em;
-          font-family: 'Rubik', sans-serif;
-          color: #98E8E7;
-      }
-    `}
-    </style>
-    <Dropdown
-      options={props.uiState.subredditNames}
-      onChange={(newVal) => {
-        props.dataState.setCurrentSubreddit(newVal.value)
-      }}
-      value={props.uiState.currentSubredditName}
-      placeholder="Select an option"
-    />
+    {suggestion}
   </div>
-))
+)
+
+@observer
+class SubredditSelector extends React.Component {
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      value: "",
+      suggestions: []
+    }
+  }
+
+  onChange = (event, {newValue}) => {
+    this.setState({
+      value: newValue
+    })
+
+    if (R.contains(newValue, this.props.uiState.subredditNames)) {
+      this.props.dataState.setCurrentSubreddit(newValue)
+    }
+  }
+
+  onSuggestionsFetchRequested = ({ value }) => {
+    this.setState({
+      suggestions: getSuggestions(value, this.props.uiState.subredditNames)
+    })
+  }
+
+  onSuggestionsClearRequested = () => {
+    this.setState({
+      suggestions: []
+    })
+  }
+
+
+  render() {
+    const {value, suggestions} = this.state
+    const inputProps = {
+      placeholder: 'subreddit goes here',
+      value,
+      onChange: this.onChange
+    }
+
+    return (
+      <div>
+        <Autosuggest
+          suggestions={suggestions}
+          onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+          onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+          getSuggestionValue={getSuggestionValue}
+          renderSuggestion={renderSuggestion}
+          inputProps={inputProps}
+          shouldRenderSuggestions={() => true}
+        />
+        <style jsx global>
+        {`.react-autosuggest__container {
+            position: relative;
+          }
+
+          .react-autosuggest__input {
+            width: 240px;
+            height: 30px;
+            padding: 10px 20px;
+            font-size: 1.6em;
+            font-family: 'Rubik', sans-serif;
+            border: 1px solid #aaa;
+            color: rgba(51, 51, 51, 0.8);
+            border-radius: 4px;
+          }
+
+          .react-autosuggest__input--focused {
+            outline: none;
+          }
+
+          .react-autosuggest__input--open {
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+          }
+
+          .react-autosuggest__suggestions-container {
+            display: none;
+          }
+
+          .react-autosuggest__suggestions-container--open {
+            display: block;
+            position: absolute;
+            top: 51px;
+            width: 280px;
+            border: 1px solid #aaa;
+            background-color: #fff;
+            color: rgba(51, 51, 51, 0.8);
+            font-family: Helvetica, sans-serif;
+            font-weight: 300;
+            font-size: 16px;
+            border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 4px;
+            z-index: 2;
+          }
+
+          .react-autosuggest__suggestions-list {
+            margin: 0;
+            padding: 0;
+            list-style-type: none;
+          }
+
+          .react-autosuggest__suggestion {
+            cursor: pointer;
+            padding: 10px 20px;
+          }
+
+          .react-autosuggest__suggestion--highlighted {
+            background-color: #ddd;
+          }
+        `}
+        </style>
+      </div>
+    )
+  }
+}
 
 export default SubredditSelector
