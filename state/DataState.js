@@ -20,8 +20,6 @@ class DataState {
       if (!this.data) {
         return
       }
-      console.log('got data')
-      console.log(this.data)
       const subredditNames = this.data.map(d => d.subreddit_name)
       this.uiState.subredditNames = subredditNames
       // this.uiState.subredditNames = Object.keys(this.data)

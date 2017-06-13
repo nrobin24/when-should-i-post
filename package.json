@@ -23,6 +23,7 @@
     "ramda": "^0.23.0",
     "react": "^15.5.4",
     "react-addons-shallow-compare": "^15.5.2",
+    "react-autosuggest": "^9.0.1",
     "react-dom": "^15.5.4",
     "react-dropdown": "^1.2.3",
     "victory": "^0.19.0"
